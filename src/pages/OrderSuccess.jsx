@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaCheckCircle, FaMapMarkerAlt, FaPhone, FaUser, FaCreditCard, FaMoneyBillWave, FaHome, FaList } from 'react-icons/fa';
-import { MdDeliveryDining } from 'react-icons/md';
+import { FaCheckCircle, FaMapMarkerAlt, FaPhone, FaUser, FaCreditCard, FaMoneyBillWave, FaHome, FaList, FaArrowRight } from 'react-icons/fa';
+import { MdDeliveryDining, MdOutlineReceiptLong } from 'react-icons/md';
 
 const OrderSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [orderData, setOrderData] = useState(null);
 
+  // 🔸 រក្សា Logic ដើមរបស់បងទាំងស្រុង
   useEffect(() => {
-    // Get order data from location state or localStorage
     if (location.state?.order) {
       setOrderData(location.state.order);
     } else {
-      // Try to get the most recent order from localStorage
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
       if (orders.length > 0) {
         setOrderData(orders[orders.length - 1]);
       } else {
-        // No order found, redirect to home
         navigate('/');
       }
     }
@@ -26,10 +24,10 @@ const OrderSuccess = () => {
 
   if (!orderData) {
     return (
-      <div className="w-full min-h-screen bg-gradient-to-b from-orange-50 to-white pt-24 pb-16 px-6 md:px-14 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading order details...</p>
+      <div className="w-full min-h-screen bg-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#2D4A22] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.3em]">Loading Order...</p>
         </div>
       </div>
     );
@@ -38,227 +36,144 @@ const OrderSuccess = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-orange-50 to-white pt-24 pb-16 px-6 md:px-14">
+    <div className="w-full min-h-screen bg-[#FDFDFD] pt-32 pb-20 px-6 md:px-14">
       <div className="max-w-4xl mx-auto">
-        {/* Success Header */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
-          <div className="text-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-              <FaCheckCircle className="text-6xl text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 bg-clip-text mb-4">
-              Order Placed Successfully!
-            </h1>
-            <p className="text-xl text-gray-600 mb-6">
-              Thank you for your order! We're preparing your delicious meal.
-            </p>
-            <div className="inline-block bg-orange-100 px-6 py-3 rounded-xl">
-              <p className="text-sm font-semibold text-gray-700 mb-1">Order ID</p>
-              <p className="text-2xl font-bold text-orange-600">#{orderData.id}</p>
-            </div>
-            <p className="text-sm text-gray-500 mt-4">{formatDate(orderData.date)}</p>
+        
+        {/* --- ក្បាលទំព័រអបអរសាទរ (Premium Header) --- */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-[#2D4A22] rounded-full mb-8 shadow-2xl shadow-[#2D4A22]/20 animate-bounce">
+            <FaCheckCircle className="text-5xl text-[#F58220]" />
           </div>
-
-          {/* Order Status */}
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 mb-6">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <MdDeliveryDining className="text-4xl text-orange-600" />
-              <div>
-                <p className="text-lg font-bold text-gray-900">Estimated Delivery Time</p>
-                <p className="text-3xl font-extrabold text-orange-600">30-45 minutes</p>
-              </div>
-            </div>
-            <p className="text-center text-sm text-gray-600">
-              Your order is being prepared and will be delivered soon!
-            </p>
-          </div>
+          <h1 className="text-5xl md:text-6xl font-black text-[#2D4A22] uppercase tracking-tighter mb-4">
+            Success<span className="text-[#F58220]">!</span>
+          </h1>
+          <p className="text-[12px] font-bold text-gray-400 uppercase tracking-[0.4em]">
+            Your order has been received and is being prepared
+          </p>
         </div>
 
-        {/* Order Details */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <FaList className="text-orange-600" />
-            Order Details
-          </h2>
-
-          {/* Ordered Items */}
-          <div className="space-y-4 mb-8">
-            {orderData.items.map((item, index) => (
-              <div
-                key={`${item.id}-${item.type}-${index}`}
-                className="flex gap-4 p-4 bg-gradient-to-r from-orange-50 to-white rounded-xl border-2 border-orange-100 hover:border-orange-300 transition-all"
-              >
-                <div className="w-20 h-20 flex-shrink-0">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover rounded-lg shadow-md"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900">{item.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{item.category}</p>
-                  <div className="flex items-center justify-between">
+        <div className="grid md:grid-cols-12 gap-10">
+          
+          {/* ផ្នែកខាងឆ្វេង: បញ្ជីមុខម្ហូប (Order Summary) */}
+          <div className="md:col-span-7 space-y-8">
+            <div className="bg-white border border-gray-100 p-8 rounded-sm shadow-sm">
+              <h2 className="text-[11px] font-black text-[#2D4A22] uppercase tracking-[0.3em] mb-8 flex items-center gap-3 border-b border-gray-50 pb-4">
+                <MdOutlineReceiptLong className="text-[#F58220]" size={18} /> Receipt Details
+              </h2>
+              
+              <div className="space-y-6 mb-10">
+                {orderData.items.map((item, index) => (
+                  <div key={`${item.id}-${index}`} className="flex justify-between items-center group">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-semibold text-gray-700">
-                        ${item.price.toFixed(2)} × {item.quantity}
-                      </span>
+                      <div className="w-20 h-20 bg-gray-50 p-1 border border-gray-100 overflow-hidden">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-[11px] font-black text-[#2D4A22] uppercase tracking-tight">{item.name}</h3>
+                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                          {item.quantity} Unit{item.quantity > 1 ? 's' : ''} × ${item.price.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-xl font-bold text-orange-600">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </span>
+                    <span className="text-sm font-black text-[#2D4A22]">${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* តារាងតម្លៃ */}
+              <div className="bg-gray-50 p-6 space-y-4">
+                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  <span>Subtotal</span>
+                  <span className="text-[#2D4A22]">${orderData.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  <span>Delivery Service</span>
+                  <span className="text-[#2D4A22]">${orderData.delivery.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-end pt-4 border-t border-gray-200">
+                  <span className="text-[11px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Total Amount</span>
+                  <span className="text-3xl font-black text-[#F58220] tracking-tighter">${orderData.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ផ្នែកខាងស្តាំ: ស្ថានភាព និងព័ត៌មានដឹកជញ្ជូន */}
+          <div className="md:col-span-5 space-y-8">
+            {/* កាតស្ថានភាពការដឹកជញ្ជូន */}
+            <div className="bg-[#2D4A22] p-8 rounded-sm text-white shadow-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#F58220] mb-2">Estimated Arrival</p>
+              <h3 className="text-4xl font-black tracking-tighter mb-4">30-45 MIN</h3>
+              <div className="w-full bg-white/10 h-[2px] mb-6 overflow-hidden">
+                <div className="bg-[#F58220] h-full w-1/2 animate-pulse"></div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest">Order ID: #{orderData.id}</p>
+                <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">{formatDate(orderData.date)}</p>
+              </div>
+            </div>
+
+            {/* ព័ត៌មានអតិថិជន */}
+            <div className="bg-white border border-gray-100 p-8 rounded-sm shadow-sm">
+              <h2 className="text-[11px] font-black text-[#2D4A22] uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                <MdDeliveryDining className="text-[#F58220]" size={18} /> Delivery to
+              </h2>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <FaUser className="text-[#F58220] mt-1" size={12} />
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Full Name</p>
+                    <p className="text-[11px] font-black text-[#2D4A22] uppercase">{orderData.customerInfo.fullName}</p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Price Breakdown */}
-          <div className="border-t-2 border-gray-200 pt-6 space-y-3">
-            <div className="flex justify-between text-gray-700 text-lg">
-              <span>Subtotal</span>
-              <span className="font-semibold">${orderData.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-gray-700 text-lg">
-              <span className="flex items-center gap-2">
-                <MdDeliveryDining className="text-xl" />
-                Delivery Fee
-              </span>
-              <span className="font-semibold">${orderData.delivery.toFixed(2)}</span>
-            </div>
-            <div className="border-t-2 border-orange-200 pt-3">
-              <div className="flex justify-between text-2xl font-bold">
-                <span className="text-gray-900">Total Paid</span>
-                <span className="text-orange-600">${orderData.total.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Delivery Information */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <MdDeliveryDining className="text-orange-600" />
-            Delivery Information
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-r from-orange-50 to-white p-4 rounded-xl border border-orange-100">
-              <div className="flex items-start gap-3">
-                <FaUser className="text-orange-600 text-xl mt-1" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-600 mb-1">Full Name</p>
-                  <p className="text-lg font-bold text-gray-900">{orderData.customerInfo.fullName}</p>
+                <div className="flex items-start gap-4">
+                  <FaPhone className="text-[#F58220] mt-1" size={12} />
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contact</p>
+                    <p className="text-[11px] font-black text-[#2D4A22] uppercase">{orderData.customerInfo.phone}</p>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-orange-50 to-white p-4 rounded-xl border border-orange-100">
-              <div className="flex items-start gap-3">
-                <FaPhone className="text-orange-600 text-xl mt-1" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-600 mb-1">Phone Number</p>
-                  <p className="text-lg font-bold text-gray-900">{orderData.customerInfo.phone}</p>
+                <div className="flex items-start gap-4">
+                  <FaMapMarkerAlt className="text-[#F58220] mt-1" size={12} />
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Location</p>
+                    <p className="text-[11px] font-black text-[#2D4A22] uppercase leading-relaxed">{orderData.customerInfo.address}, {orderData.customerInfo.city}</p>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="md:col-span-2 bg-gradient-to-r from-orange-50 to-white p-4 rounded-xl border border-orange-100">
-              <div className="flex items-start gap-3">
-                <FaMapMarkerAlt className="text-orange-600 text-xl mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-600 mb-1">Delivery Address</p>
-                  <p className="text-lg font-bold text-gray-900">
-                    {orderData.customerInfo.address}, {orderData.customerInfo.city}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {orderData.customerInfo.notes && (
-              <div className="md:col-span-2 bg-gradient-to-r from-blue-50 to-white p-4 rounded-xl border border-blue-100">
-                <div className="flex items-start gap-3">
+                <div className="pt-6 border-t border-gray-50 flex items-center gap-4">
+                  <div className="w-10 h-10 bg-gray-50 border border-gray-100 flex items-center justify-center rounded-full text-[#2D4A22]">
+                    {orderData.customerInfo.paymentMethod === 'cash' ? <FaMoneyBillWave size={16} /> : <FaCreditCard size={16} />}
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-600 mb-1">Delivery Notes</p>
-                    <p className="text-base text-gray-700 italic">{orderData.customerInfo.notes}</p>
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Method</p>
+                    <p className="text-[11px] font-black text-[#2D4A22] uppercase">{orderData.customerInfo.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Digital Payment'}</p>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Payment Method */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <FaCreditCard className="text-orange-600" />
-            Payment Method
-          </h2>
-
-          <div className="bg-gradient-to-r from-green-50 to-white p-6 rounded-xl border-2 border-green-200">
-            <div className="flex items-center gap-4">
-              {orderData.customerInfo.paymentMethod === 'cash' ? (
-                <>
-                  <FaMoneyBillWave className="text-4xl text-green-600" />
-                  <div>
-                    <p className="text-xl font-bold text-gray-900">Cash on Delivery</p>
-                    <p className="text-sm text-gray-600">Pay when you receive your order</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <FaCreditCard className="text-4xl text-blue-600" />
-                  <div>
-                    <p className="text-xl font-bold text-gray-900">Credit/Debit Card</p>
-                    <p className="text-sm text-gray-600">Payment completed</p>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+        {/* --- ប៊ូតុងត្រឡប់ក្រោយ --- */}
+        <div className="mt-20 flex flex-col sm:flex-row gap-6 justify-center">
+          <button 
+            onClick={() => navigate('/')} 
+            className="px-12 py-5 bg-[#2D4A22] text-white font-black text-[11px] uppercase tracking-[0.4em] hover:bg-[#1e3317] transition-all flex items-center justify-center gap-4 group"
           >
-            <FaHome className="text-xl" />
-            Back to Home
+            <FaHome size={14} /> Back to Home
           </button>
-          <button
-            onClick={() => navigate('/order-history')}
-            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+          <button 
+            onClick={() => navigate('/order-history')} 
+            className="px-12 py-5 border-2 border-[#2D4A22] text-[#2D4A22] font-black text-[11px] uppercase tracking-[0.4em] hover:bg-[#2D4A22] hover:text-white transition-all flex items-center justify-center gap-4 group"
           >
-            <FaList className="text-xl" />
-            View Order History
+            <FaList size={14} /> My History <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
           </button>
-          <button
-            onClick={() => navigate('/MenuFood')}
-            className="flex-1 bg-white hover:bg-orange-50 text-orange-600 border-2 border-orange-600 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-          >
-            Order More Food
-          </button>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mt-8 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl p-6 text-center">
-          <p className="text-lg font-semibold text-gray-900 mb-2">
-            🎉 Thank you for choosing Delish-Kh!
-          </p>
-          <p className="text-sm text-gray-700">
-            Your satisfaction is our priority. Enjoy your meal! 🍽️
-          </p>
         </div>
       </div>
     </div>

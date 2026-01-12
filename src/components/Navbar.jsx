@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { menu } from '../data';
-import { IoSearch, IoCloseSharp } from "react-icons/io5";
-import { FaRegHeart, FaRegUser, FaBars } from "react-icons/fa";
+import { 
+  IoSearch, IoCloseSharp, IoHomeOutline, 
+  IoFastFoodOutline, IoInformationCircleOutline, IoCallOutline 
+} from "react-icons/io5";
+import { 
+  FaRegHeart, FaRegUser, FaBars, FaLeaf, 
+  FaSignOutAlt, FaChevronRight 
+} from "react-icons/fa";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -11,6 +17,7 @@ const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  
   const [openSidebar, setOpenSidebar] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
@@ -18,372 +25,228 @@ const Navbar = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchInput, setSearchInput] = useState('');
 
+  // --- Logic ជំនួយ ---
   const isActive = (path) => {
-    // Don't highlight any menu when on favorites, cart, or order-related pages
-    if (location.pathname === '/favorites' || 
-        location.pathname === '/cart' || 
-        location.pathname === '/checkout' ||
-        location.pathname === '/order-success' ||
-        location.pathname === '/order-history') {
-      return false;
-    }
-    
-    // Exact match for the path
+    const noHighlight = ['/favorites', '/cart', '/checkout', '/order-success', '/order-history'];
+    if (noHighlight.includes(location.pathname)) return false;
     return location.pathname === path;
   };
 
-  // Check user authentication
+  const getMenuIcon = (key) => {
+    switch(key) {
+      case 'nav.home': return <IoHomeOutline size={20} />;
+      case 'nav.menu': return <IoFastFoodOutline size={20} />;
+      case 'nav.about': return <IoInformationCircleOutline size={20} />;
+      case 'nav.contact': return <IoCallOutline size={20} />;
+      default: return <FaChevronRight size={12} />;
+    }
+  };
+
+  // --- Auth & Storage Effects ---
   useEffect(() => {
     const checkAuth = () => {
       const user = localStorage.getItem('currentUser');
       setCurrentUser(user ? JSON.parse(user) : null);
     };
-    
     checkAuth();
-    
-    // Listen for auth changes
     window.addEventListener('authChanged', checkAuth);
     return () => window.removeEventListener('authChanged', checkAuth);
   }, []);
 
-  // Update favorites count on mount and listen for storage changes
   useEffect(() => {
-    const updateFavoritesCount = () => {
-      // Only show count if user is logged in
+    const updateCounts = () => {
       const user = localStorage.getItem('currentUser');
       if (user) {
         const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         setFavoritesCount(favorites.length);
+        setCartCount(cart.reduce((sum, item) => sum + item.quantity, 0));
       } else {
         setFavoritesCount(0);
-      }
-    };
-
-    updateFavoritesCount();
-
-    // Listen for storage changes (when favorites are updated)
-    window.addEventListener('storage', updateFavoritesCount);
-    
-    // Custom event listener for same-window updates
-    window.addEventListener('favoritesUpdated', updateFavoritesCount);
-
-    return () => {
-      window.removeEventListener('storage', updateFavoritesCount);
-      window.removeEventListener('favoritesUpdated', updateFavoritesCount);
-    };
-  }, []);
-
-  // Update cart count on mount and listen for storage changes
-  useEffect(() => {
-    const updateCartCount = () => {
-      // Only show count if user is logged in
-      const user = localStorage.getItem('currentUser');
-      if (user) {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        setCartCount(totalItems);
-      } else {
         setCartCount(0);
       }
     };
-
-    updateCartCount();
-
-    window.addEventListener('storage', updateCartCount);
-    window.addEventListener('cartUpdated', updateCartCount);
-
+    updateCounts();
+    window.addEventListener('storage', updateCounts);
+    window.addEventListener('favoritesUpdated', updateCounts);
+    window.addEventListener('cartUpdated', updateCounts);
     return () => {
-      window.removeEventListener('storage', updateCartCount);
-      window.removeEventListener('cartUpdated', updateCartCount);
+      window.removeEventListener('storage', updateCounts);
+      window.removeEventListener('favoritesUpdated', updateCounts);
+      window.removeEventListener('cartUpdated', updateCounts);
     };
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('cart');
+    localStorage.removeItem('favorites');
+    setCurrentUser(null);
+    setCartCount(0);
+    setFavoritesCount(0);
+    window.dispatchEvent(new Event('authChanged'));
+    window.dispatchEvent(new Event('cartUpdated'));
+    window.dispatchEvent(new Event('favoritesUpdated'));
+    setOpenSidebar(false);
+    navigate('/home');
+  };
+
   return (
-    <div className="w-full h-[80px] px-5 lg:px-14 shadow-lg sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-orange-100">
-      {/* Navbar */}
-      <div className="w-full h-full flex justify-between">
-        {/* menu and logo */}
-        <div className="lg:w-[55%] h-full flex justify-between items-center">
-          {/* LEFT: LOGO */}
-          <div className="flex items-center gap-3 flex-none pr-6">
-            <Link to='/' className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-chef-hat w-6 h-6 text-white"
-                >
-                  <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
-                  <line x1="6" x2="18" y1="17" y2="17"></line>
-                </svg>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">
-                Delish-Kh
-              </span>
-            </Link>
+    <nav className="w-full sticky top-0 z-50 bg-white shadow-sm font-sans">
+      
+      {/* --- DESKTOP TOP BAR --- */}
+      <div className="hidden xl:block w-full bg-[#1a2e35] py-2 px-14">
+        <div className="flex justify-between items-center text-white text-[12px] font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-6">
+            <p>Welcome to Khmer-Fresh Organic Store</p>
+            <div className="h-3 w-[1px] bg-white/20"></div>
+            <p className="text-orange-400">Call Us: +855 972325094</p>
           </div>
-
-            {/* CENTER: MENU */}
-            <ul className="hidden lg:flex flex-nowrap gap-8 flex-shrink justify-end pl-6 whitespace-nowrap overflow-hidden">
-              {menu.map((u) => (
-                <li className="group relative" key={u.id}>
-                  <Link
-                    to={u.link}
-                    className={`text-lg font-medium transition-all duration-300 ${
-                      isActive(u.link)
-                        ? 'text-orange-600 font-semibold'
-                        : 'text-gray-700 hover:text-orange-600'
-                    }`}
-                  >
-                    {t(u.key)}
-                    <span
-                      className={`absolute left-0 -bottom-1 h-[3px] bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-300 ${
-                        isActive(u.link) ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`}
-                    ></span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-        </div>
-
-        {/* search & icons */}
-        <div className="lg:w-[45%] h-full flex">
-          {/* input search */}
-          <div className="w-[75%] lg:flex hidden relative ps-24 p-5 h-full">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchInput.trim()) {
-                  navigate(`/search?q=${encodeURIComponent(searchInput)}`);
-                  setSearchInput('');
-                }
-              }}
-              className="w-full h-full"
-            >
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-full px-5 ps-12 rounded-full outline-0 shadow-md border border-gray-200 text-gray-700 placeholder-gray-400 hover:border-orange-300 focus:border-orange-500 transition-all duration-300"
-                placeholder={t('nav.search')}
-              />
-              <IoSearch className="absolute top-8 left-28 text-xl text-orange-500 pointer-events-none" />
-            </form>
-          </div>
-
-          {/* icons */}
-          <div className="lg:w-[30%] h-full flex items-center justify-around gap-2">
-            <Link to="/favorites" className="relative group cursor-pointer lg:flex hidden">
-              <FaRegHeart className={`text-2xl group-hover:scale-110 transition-all duration-300 ${
-                location.pathname === '/favorites' 
-                  ? 'text-red-500 scale-110' 
-                  : 'text-gray-700 hover:text-red-500'
-              }`} />
-              {favoritesCount > 0 && (
-                <div className="w-5 h-5 bg-gradient-to-r from-red-500 to-pink-500 flex items-center absolute -top-2 -right-2 text-xs font-bold justify-center text-white rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  {favoritesCount}
-                </div>
-              )}
-            </Link>
-            <IoSearch onClick={() => setOpenSearch(true)} className="text-2xl lg:text-xl lg:hidden flex text-gray-700 hover:text-orange-600 cursor-pointer" />
-
-            <Link to="/cart" className="relative group cursor-pointer">
-              <HiOutlineShoppingCart className={`text-2xl lg:text-2xl group-hover:scale-110 transition-all duration-300 ${
-                location.pathname === '/cart'
-                  ? 'text-orange-600 scale-110'
-                  : 'text-gray-700 hover:text-orange-600'
-              }`} />
-              {cartCount > 0 && (
-                <div className="w-5 h-5 bg-gradient-to-r from-orange-500 to-red-500 flex items-center absolute -top-2 -right-2 text-xs font-bold justify-center text-white rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  {cartCount}
-                </div>
-              )}
-            </Link>
-
-            {/* Language Switcher */}
-            <div className="lg:flex hidden">
-              <LanguageSwitcher />
-            </div>
-
-            <FaBars
-              onClick={() => setOpenSidebar(!openSidebar)}
-              className="text-2xl lg:text-xl lg:hidden flex cursor-pointer text-gray-700 hover:text-orange-600"
-            />
-            
-            {/* User Icon / Login */}
+          <div className="flex items-center gap-6">
+            <LanguageSwitcher />
+            <div className="h-3 w-[1px] bg-white/20"></div>
             {currentUser ? (
-              <div className="relative group lg:flex hidden">
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">{currentUser.name.charAt(0).toUpperCase()}</span>
+              <div className="relative group cursor-pointer flex items-center gap-2">
+                <span>Hello, {currentUser.name}</span>
+                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="bg-white shadow-xl rounded-lg py-2 w-40 border border-gray-100 text-gray-800">
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors">{t('nav.logout')}</button>
                   </div>
-                </div>
-                {/* Dropdown */}
-                <div className="absolute right-0 top-12 bg-white rounded-xl shadow-2xl py-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="font-semibold text-gray-900 text-sm">{currentUser.name}</p>
-                    <p className="text-xs text-gray-500">{currentUser.email}</p>
-                  </div>
-                  <Link to="/favorites" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-sm">
-                    {t('nav.myFavorites')}
-                  </Link>
-                  <Link to="/cart" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-sm">
-                    {t('nav.myCart')}
-                  </Link>
-                  <Link to="/order-history" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-sm">
-                    {t('nav.orderHistory')}
-                  </Link>
-                  <button
-                    onClick={() => {
-                      // Clear user session
-                      localStorage.removeItem('currentUser');
-                      // Clear cart and favorites on logout
-                      localStorage.removeItem('cart');
-                      localStorage.removeItem('favorites');
-                      setCurrentUser(null);
-                      setCartCount(0);
-                      setFavoritesCount(0);
-                      window.dispatchEvent(new Event('authChanged'));
-                      window.dispatchEvent(new Event('cartUpdated'));
-                      window.dispatchEvent(new Event('favoritesUpdated'));
-                      navigate('/home');
-                    }}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors text-sm border-t border-gray-100"
-                  >
-                    {t('nav.logout')}
-                  </button>
                 </div>
               </div>
             ) : (
-              <Link 
-                to="/login" 
-                className="lg:flex hidden items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-full font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                <FaRegUser />
-                {t('nav.login')}
-              </Link>
+              <Link to="/login" className="hover:text-[#2d5a27] transition-colors">{t('nav.login')}</Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Backdrop overlay */}
-      <div 
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300
-        ${openSidebar ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        onClick={() => setOpenSidebar(false)}
-      ></div>
+      {/* --- MAIN BAR --- */}
+      <div className="w-full h-[80px] px-5 lg:px-14 flex items-center justify-between border-b border-gray-100 bg-white">
+        <Link to='/' className="flex items-center space-x-2 shrink-0">
+          <div className="bg-[#2d5a27]/10 p-2 rounded-lg transition-transform hover:rotate-12">
+            <FaLeaf className="text-[#2d5a27] md:text-2xl text-xl" />
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="md:text-2xl text-xl font-black text-[#1a2e35] tracking-tighter uppercase">
+              KHMER<span className="text-[#2d5a27]">-FRESH</span>
+            </span>
+            <span className="text-[9px] font-bold text-orange-600 tracking-[0.25em] uppercase">Authentic Taste</span>
+          </div>
+        </Link>
 
-      {/* Sidebar */}
-      <div
-        className={`w-[75%] md:w-1/2 h-screen fixed z-50 top-0 left-0 bg-gradient-to-br from-orange-500 via-orange-600 to-red-500 lg:hidden shadow-2xl
-        ${openSidebar ? 'translate-x-0' : '-translate-x-full'} transition-all duration-300 ease-in-out`}
-      >
-        {/* header */}
-        <div className="w-full h-[80px] px-4 flex items-center justify-between border-b border-white/30">
-            {/* logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-6 h-6 text-white"
-              >
-                <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
-                <line x1="6" x2="18" y1="17" y2="17"></line>
-              </svg>
-            </div>
-            <span className="text-2xl font-bold text-white">Delish-Kh</span>
-          </Link>
-          <IoCloseSharp
-            className="text-white text-3xl md:text-4xl cursor-pointer hover:rotate-90 transition-transform duration-300"
-            onClick={() => setOpenSidebar(false)}
-          />
-        </div>
-
-        {/* menu */}
-        <ul className="mt-4">
+        {/* Desktop Menu */}
+        <ul className="hidden xl:flex items-center gap-8 mx-auto">
           {menu.map((u) => (
-            <li
-              className={`px-6 py-4 transition-all duration-300 ease-in-out border-l-4 ${
-                isActive(u.link)
-                  ? 'bg-white/20 border-white'
-                  : 'border-transparent hover:bg-white/20 hover:border-white'
-              }`}
-              key={u.id}
-            >
-              <Link
-                to={u.link}
-                className={`text-lg font-medium transition-all duration-300 ease-in-out flex items-center ${
-                  isActive(u.link) ? 'text-yellow-200 font-semibold' : 'text-white hover:text-yellow-200'
-                }`}
-                onClick={() => setOpenSidebar(false)}
-              >
+            <li key={u.id} className="relative group h-full flex items-center">
+              <Link to={u.link} className={`text-[14px] font-bold uppercase tracking-widest transition-all duration-300 ${isActive(u.link) ? 'text-[#2d5a27]' : 'text-gray-500 hover:text-[#2d5a27]'}`}>
                 {t(u.key)}
               </Link>
+              <span className={`absolute -bottom-1 left-0 h-[3px] bg-[#2d5a27] rounded-full transition-all duration-300 ${isActive(u.link) ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
             </li>
           ))}
         </ul>
-        {/* button */}
-        <div className="p-6 absolute bottom-8 left-0 right-0">
-          <button className="bg-white text-orange-600 w-full py-3 text-lg font-bold rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
-            {t('nav.orderNow')}
+
+        {/* Right Icons */}
+        <div className="flex items-center gap-1 md:gap-4">
+          <button onClick={() => setOpenSearch(!openSearch)} className="p-2 text-gray-700 hover:text-[#2d5a27] transition-colors">
+            <IoSearch size={25} />
+          </button>
+          <Link to="/favorites" className="hidden xl:block relative p-2 text-gray-700 hover:text-red-500 transition-colors">
+            <FaRegHeart size={24} />
+            {favoritesCount > 0 && <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white shadow-sm">{favoritesCount}</span>}
+          </Link>
+          <Link to="/cart" className="relative p-2 text-gray-700 hover:text-[#2d5a27] transition-colors">
+            <HiOutlineShoppingCart size={26} />
+            {cartCount > 0 && <span className="absolute top-1 right-1 bg-[#2d5a27] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white shadow-sm">{cartCount}</span>}
+          </Link>
+          <button onClick={() => setOpenSidebar(true)} className="xl:hidden p-2 text-gray-700 hover:text-[#2d5a27]">
+            <FaBars size={25} />
           </button>
         </div>
       </div>
 
-      {/* open search */}
-      <div className={`w-full min-h-[180px] lg:min-h-[220px] z-50 absolute top-0 left-0 bg-white/98 backdrop-blur-md shadow-2xl border-b border-orange-200
-                    ${openSearch ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}
-                    transition-all duration-500 ease-in-out`}>
-        <div className="w-full h-full px-6 md:px-14 lg:px-28 flex flex-col items-center relative pt-8">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchInput.trim()) {
-                  navigate(`/search?q=${encodeURIComponent(searchInput)}`);
-                  setSearchInput('');
-                  setOpenSearch(false);
-                }
-              }}
-              className="relative w-full"
-            >
-              <IoSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl text-orange-500 pointer-events-none" />
-              <input 
-                type="text" 
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-[50px] md:h-[60px] border-2 border-orange-300 px-5 pl-14 md:px-10 md:pl-16 rounded-full 
-                                      text-base md:text-lg text-gray-700 placeholder-gray-400 focus:border-orange-500
-                                      shadow-lg transition-all outline-none"
-                placeholder={t('nav.searchMobile')}
-                autoFocus 
-              />
-            </form>
-            <IoCloseSharp
-                        onClick={() => setOpenSearch(false)}
-                        className="text-orange-600 absolute text-3xl md:text-4xl top-4 md:top-6 right-6 lg:right-14 cursor-pointer 
-                                    hover:rotate-90 hover:scale-110 transition-all duration-300"
-                        />
+      {/* --- SIDEBAR MOBILE --- */}
+      <div className={`fixed inset-0 bg-[#1a2e35]/60 backdrop-blur-md z-[100] xl:hidden transition-opacity duration-500 ${openSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setOpenSidebar(false)}></div>
+      <div className={`w-[300px] h-screen fixed z-[110] top-0 left-0 bg-white xl:hidden shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${openSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="w-full h-[180px] bg-gradient-to-br from-[#2d5a27] to-[#1a2e35] p-6 flex flex-col justify-between relative overflow-hidden text-white">
+          <FaLeaf className="absolute -right-10 -bottom-10 text-white/10 text-[150px] rotate-12" />
+          <div className="flex justify-between items-start relative z-10">
+            <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/20"><FaLeaf size={20} /></div>
+            <button onClick={() => setOpenSidebar(false)} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-red-500 transition-all"><IoCloseSharp size={24} /></button>
+          </div>
+          <div className="relative z-10 uppercase">
+            <h2 className="text-2xl font-black tracking-tighter">KHMER-FRESH</h2>
+            <p className="text-white/60 text-[10px] font-bold mt-1">Authentic Traditional Food</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col h-[calc(100vh-180px)] justify-between">
+          <div className="overflow-y-auto py-6 px-4">
+            <ul className="space-y-2">
+              {menu.map((u) => (
+                <li key={u.id}>
+                  <Link to={u.link} className={`flex items-center justify-between px-4 py-3.5 rounded-2xl font-bold transition-all ${isActive(u.link) ? 'bg-[#2d5a27] text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'}`} onClick={() => setOpenSidebar(false)}>
+                    <div className="flex items-center gap-4">
+                      {getMenuIcon(u.key)}
+                      <span className="text-[15px] uppercase">{t(u.key)}</span>
+                    </div>
+                    <FaChevronRight size={10} className={isActive(u.link) ? 'rotate-90' : 'opacity-30'} />
+                  </Link>
+                </li>
+              ))}
+
+              {/* ប៊ូតុង Favorite ដែលប្រើ translation t('nav.favorites') */}
+              <li className="mt-4 pt-4 border-t border-gray-100">
+                <Link to="/favorites" className={`flex items-center justify-between px-4 py-3.5 rounded-2xl font-bold transition-all ${location.pathname === '/favorites' ? 'bg-red-500 text-white shadow-lg' : 'text-gray-600 hover:bg-red-50 hover:text-white group'}`} onClick={() => setOpenSidebar(false)}>
+                  <div className="flex items-center gap-4">
+                    <FaRegHeart size={20} className={location.pathname === '/favorites' ? 'text-white' : 'text-red-500 group-hover:text-white'} />
+                    <span className="text-[15px] uppercase">{t('nav.favorites')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {favoritesCount > 0 && <span className={`text-[10px] w-6 h-6 flex items-center justify-center rounded-full font-bold ${location.pathname === '/favorites' ? 'bg-white text-red-500' : 'bg-red-500 text-white'}`}>{favoritesCount}</span>}
+                    <FaChevronRight size={10} className="opacity-30" />
+                  </div>
+                </Link>
+              </li>
+            </ul>
+
+            <div className="mt-8 pt-6 border-t border-gray-100 px-2 flex justify-between items-center">
+               <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Language</span>
+               <div className="scale-90"><LanguageSwitcher /></div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50 border-t border-gray-100">
+            {currentUser ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-2 bg-white rounded-2xl border border-gray-100">
+                  <div className="w-12 h-12 bg-[#2d5a27] rounded-2xl flex items-center justify-center text-white font-black text-xl">{currentUser.name.charAt(0).toUpperCase()}</div>
+                  <div className="overflow-hidden leading-tight text-gray-800">
+                    <p className="text-sm font-black truncate">{currentUser.name}</p>
+                    <p className="text-[10px] text-gray-400 truncate font-bold">{currentUser.email}</p>
+                  </div>
+                </div>
+                <button onClick={handleLogout} className="w-full py-4 bg-white text-red-500 border border-red-100 rounded-2xl font-black text-xs shadow-sm"><FaSignOutAlt className="inline mr-2" /> {t('nav.logout')}</button>
+              </div>
+            ) : (
+              <Link to="/login" onClick={() => setOpenSidebar(false)} className="w-full py-4 bg-[#2d5a27] text-white rounded-2xl font-black text-sm flex justify-center items-center gap-2 shadow-lg"><FaRegUser /> {t('nav.login')}</Link>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* --- SEARCH OVERLAY --- */}
+      <div className={`w-full z-[120] absolute top-0 left-0 bg-white border-b-2 border-[#2d5a27] transition-all duration-500 ${openSearch ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}>
+        <div className="w-full px-6 py-12 flex flex-col items-center relative">
+            <form onSubmit={(e) => { e.preventDefault(); if (searchInput.trim()) { navigate(`/search?q=${encodeURIComponent(searchInput)}`); setSearchInput(''); setOpenSearch(false); } }} className="relative w-full max-w-2xl">
+              <IoSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl text-[#2d5a27]" />
+              <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full h-14 border-2 border-gray-100 px-5 pl-14 rounded-full outline-none focus:border-[#2d5a27] shadow-xl text-lg font-bold" placeholder={t('nav.search')} autoFocus />
+            </form>
+            <IoCloseSharp onClick={() => setOpenSearch(false)} className="text-[#2d5a27] absolute text-3xl top-4 right-6 cursor-pointer hover:rotate-90 transition-transform duration-300" />
+        </div>
+      </div>
+    </nav>
   );
 };
 

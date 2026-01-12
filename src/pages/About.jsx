@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { FaUtensils, FaHeart, FaAward, FaClock } from 'react-icons/fa';
+import { FaUtensils, FaHeart, FaFacebook, FaInstagram, FaLinkedin, FaQuoteLeft, FaArrowRight } from 'react-icons/fa';
 import { MdDeliveryDining } from 'react-icons/md';
-import { BiWorld } from 'react-icons/bi';
+import { BiLeaf } from 'react-icons/bi';
 
-import neangImage from '../assets/image/neang.jpg';
+// រក្សារូបភាពក្រុមការងារ
+import senngImage from '../assets/image/sengsarina.jpg';
 import vizaImage from '../assets/image/viza.jpg';
+import channaImage from '../assets/image/channa.jpg';
 
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -16,111 +18,164 @@ const About = () => {
 
   useEffect(() => {
     AOS.init({
-      duration: 900,
+      duration: 1000,
       easing: "ease-in-out",
       once: true,
     });
   }, []);
 
+  // រក្សាទិន្នន័យក្រុមការងារ (keep all old data)
+  const teamMembers = [
+    { name: "CHANNA", role: "General Manager", image: channaImage, delay: "0" },
+    { name: "Sarina", role: t('about.headChef'), image: senngImage, delay: "200" },
+    { name: "VIZA", role: t('about.pastryChef'), image: vizaImage, delay: "400" }
+  ];
+
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-orange-50 to-white pt-24 pb-16 px-6 md:px-14">
-
-      <div className="max-w-7xl mx-auto">
-
-        {/* Hero Section */}
-        <div data-aos="fade-down" className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 bg-clip-text mb-4">
-            {t('about.title')}
+    <div className="w-full min-h-screen bg-[#FDFDFD] pt-24 pb-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-14">
+        
+        {/* --- Header Section (Old Data + New Style) --- */}
+        <div data-aos="fade-down" className="mb-16 border-l-8 border-[#2D4A22] pl-6">
+          <h1 className="text-4xl md:text-5xl font-black text-[#2D4A22] uppercase tracking-tighter">
+            {t('about.title')} <span className="text-[#F58220]">History</span>
           </h1>
-          <p data-aos="fade-up" className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-gray-500 font-medium mt-2 uppercase text-xs tracking-[0.3em]">
             {t('about.subtitle')}
           </p>
         </div>
 
-        {/* Our Story */}
-        <div data-aos="fade-up" className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{t('about.ourStory')}</h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            {t('about.storyPara1')}
-          </p>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            {t('about.storyPara2')}
-          </p>
-        </div>
-
-        {/* Values */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div data-aos="zoom-in" className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaHeart className="text-3xl text-white" />
+        {/* --- Section: Story (Typography Style - NO IMAGE) --- */}
+        <div className="relative py-20 mb-28 border-y border-gray-100 overflow-hidden">
+          <BiLeaf className="absolute -top-10 -right-10 text-[#2D4A22]/5" size={400} />
+          
+          <div className="grid lg:grid-cols-12 gap-12 items-center relative z-10">
+            {/* Left Side: Bold Text Heading */}
+            <div className="lg:col-span-5" data-aos="fade-right">
+              <span className="text-[#F58220] font-black text-sm uppercase tracking-[0.4em] mb-4 block">Since 2018</span>
+              <h2 className="text-6xl md:text-7xl font-black text-[#2D4A22] uppercase leading-[0.9] tracking-tighter">
+                {t('about.ourStory').split(' ')[0]} <br />
+                <span className="text-gray-200 outline-text italic">Journey</span> <br />
+                Story.
+              </h2>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.authenticRecipes')}</h3>
-            <p className="text-gray-700">{t('about.authenticRecipesDesc')}</p>
-          </div>
 
-          <div data-aos="zoom-in" data-aos-delay="150" className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaUtensils className="text-3xl text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.freshIngredients')}</h3>
-            <p className="text-gray-700">{t('about.freshIngredientsDesc')}</p>
-          </div>
-
-          <div data-aos="zoom-in" data-aos-delay="300" className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MdDeliveryDining className="text-3xl text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.fastDelivery')}</h3>
-            <p className="text-gray-700">{t('about.fastDeliveryDesc')}</p>
-          </div>
-        </div>
-
-        {/* Meet Our Team */}
-        <div className="mb-16">
-          <h2 data-aos="fade-up" className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">{t('about.meetOurTeam')}</h2>
-
-          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-
-            <div data-aos="fade-right" className="bg-white rounded-3xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300">
-              <img src={neangImage} className="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Neang</h3>
-                <p className="text-orange-600 font-semibold mb-3">{t('about.headChef')}</p>
-                <p className="text-gray-700">{t('about.neangDesc')}</p>
+            {/* Right Side: Narrative Content (Old Data) */}
+            <div className="lg:col-span-7 space-y-8" data-aos="fade-left">
+              <div className="relative">
+                <FaQuoteLeft className="text-[#F58220] opacity-20 absolute -top-6 -left-8" size={60} />
+                <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-tight italic">
+                  {t('about.storyPara1')}
+                </p>
+              </div>
+              
+              <div className="pt-6 border-t border-gray-100">
+                <p className="text-gray-500 text-lg leading-relaxed">
+                  {t('about.storyPara2')}
+                </p>
               </div>
             </div>
+          </div>
+          
+          <style dangerouslySetInnerHTML={{__html: `
+            .outline-text {
+              -webkit-text-stroke: 1px #2D4A22;
+              color: transparent;
+            }
+          `}} />
+        </div>
 
-            <div data-aos="fade-left" className="bg-white rounded-3xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300">
-              <img src={vizaImage} className="w-full h-96 object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Viza</h3>
-                <p className="text-orange-600 font-semibold mb-3">{t('about.pastryChef')}</p>
-                <p className="text-gray-700">{t('about.vizaDesc')}</p>
-              </div>
+        {/* --- Values Section (Old Icons + Data) --- */}
+        <div className="grid md:grid-cols-3 gap-8 mb-28">
+          <div data-aos="zoom-in" className="bg-white p-10 border border-gray-50 text-center hover:shadow-2xl transition-all duration-500 group">
+            <div className="w-16 h-16 bg-[#2D4A22] group-hover:bg-[#F58220] rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
+              <FaHeart className="text-2xl text-white" />
             </div>
+            <h3 className="text-xl font-black text-[#2D4A22] mb-3 uppercase tracking-tight">{t('about.authenticRecipes')}</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">{t('about.authenticRecipesDesc')}</p>
+          </div>
 
+          <div data-aos="zoom-in" data-aos-delay="200" className="bg-white p-10 border border-gray-50 text-center hover:shadow-2xl transition-all duration-500 group">
+            <div className="w-16 h-16 bg-[#2D4A22] group-hover:bg-[#F58220] rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
+              <FaUtensils className="text-2xl text-white" />
+            </div>
+            <h3 className="text-xl font-black text-[#2D4A22] mb-3 uppercase tracking-tight">{t('about.freshIngredients')}</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">{t('about.freshIngredientsDesc')}</p>
+          </div>
+
+          <div data-aos="zoom-in" data-aos-delay="400" className="bg-white p-10 border border-gray-50 text-center hover:shadow-2xl transition-all duration-500 group">
+            <div className="w-16 h-16 bg-[#2D4A22] group-hover:bg-[#F58220] rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
+              <MdDeliveryDining className="text-2xl text-white" />
+            </div>
+            <h3 className="text-xl font-black text-[#2D4A22] mb-3 uppercase tracking-tight">{t('about.fastDelivery')}</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">{t('about.fastDeliveryDesc')}</p>
           </div>
         </div>
 
-        {/* Stats */}
-        <div data-aos="zoom-in" className="bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl p-12 text-white mb-12">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div><div className="text-5xl font-bold mb-2">5+</div><p>{t('about.yearsOfService')}</p></div>
-            <div><div className="text-5xl font-bold mb-2">50+</div><p>{t('about.menuItems')}</p></div>
-            <div><div className="text-5xl font-bold mb-2">10K+</div><p>{t('about.happyCustomers')}</p></div>
-            <div><div className="text-5xl font-bold mb-2">4.9</div><p>{t('about.averageRating')}</p></div>
+        {/* --- Team Section (3 Column Layout) --- */}
+        <div className="mb-28">
+          <div className="text-center mb-16">
+            <h2 data-aos="fade-up" className="text-4xl font-black text-[#2D4A22] uppercase tracking-tighter">
+              {t('about.meetOurTeam')}
+            </h2>
+            <div className="w-20 h-1 bg-[#F58220] mx-auto mt-4"></div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {teamMembers.map((member, index) => (
+              <div key={index} data-aos="fade-up" data-aos-delay={member.delay} className="group relative overflow-hidden bg-white">
+                <div className="h-[500px] overflow-hidden">
+                  <img src={member.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2D4A22] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white">
+                  <h3 className="text-2xl font-black uppercase italic">{member.name}</h3>
+                  <p className="text-[#F58220] text-xs font-bold uppercase tracking-widest mb-4">{member.role}</p>
+                  <div className="flex gap-4">
+                    <FaFacebook className="hover:text-[#F58220] cursor-pointer" />
+                    <FaInstagram className="hover:text-[#F58220] cursor-pointer" />
+                    <FaLinkedin className="hover:text-[#F58220] cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* CTA */}
-        <div data-aos="fade-up" className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('about.ctaTitle')}</h2>
-          <p className="text-gray-600 mb-8 text-lg">{t('about.ctaSubtitle')}</p>
+        {/* --- Stats Section (Old Data + Minimal Style) --- */}
+        <div data-aos="zoom-in" className="bg-[#2D4A22] py-20 px-10 text-white rounded-3xl mb-28">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+            <div>
+              <div className="text-5xl font-black text-[#F58220] mb-2 italic">5+</div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">{t('about.yearsOfService')}</p>
+            </div>
+            <div>
+              <div className="text-5xl font-black text-[#F58220] mb-2 italic">50+</div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">{t('about.menuItems')}</p>
+            </div>
+            <div>
+              <div className="text-5xl font-black text-[#F58220] mb-2 italic">10K+</div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">{t('about.happyCustomers')}</p>
+            </div>
+            <div>
+              <div className="text-5xl font-black text-[#F58220] mb-2 italic">4.9</div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">{t('about.averageRating')}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* --- Call to Action (Old Data + New Button) --- */}
+        <div data-aos="fade-up" className="text-center py-20 border-[15px] border-gray-50 bg-white">
+          <h2 className="text-5xl font-black text-[#2D4A22] mb-6 uppercase tracking-tighter leading-none">
+            {t('about.ctaTitle')}
+          </h2>
+          <p className="text-gray-400 mb-12 text-lg max-w-2xl mx-auto italic">
+            {t('about.ctaSubtitle')}
+          </p>
           <Link
             to="/MenuFood"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-4 px-12 py-5 bg-[#2D4A22] text-white font-black text-xs uppercase tracking-[0.4em] hover:bg-[#F58220] transition-all duration-300 shadow-2xl group"
           >
-            {t('about.browseMenu')}
+            {t('about.browseMenu')} <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
           </Link>
         </div>
 

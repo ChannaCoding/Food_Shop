@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaArrowLeft } from 'react-icons/fa';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
 
+  // 🔸 Logic ដើមរបស់បង (មិនកែប្រែ)
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,9 +27,8 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match!');
       return;
     }
 
@@ -37,16 +37,13 @@ const Register = () => {
       return;
     }
 
-    // Get existing users
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     
-    // Check if email already exists
     if (users.some(u => u.email === formData.email)) {
-      setError('Email already registered');
+      setError('This email is already registered!');
       return;
     }
 
-    // Create new user
     const newUser = {
       id: Date.now(),
       name: formData.name,
@@ -56,202 +53,170 @@ const Register = () => {
       createdAt: new Date().toISOString()
     };
 
-    // Save to localStorage
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
 
-    // Auto login
     localStorage.setItem('currentUser', JSON.stringify({
       id: newUser.id,
       name: newUser.name,
       email: newUser.email
     }));
 
-    // Notify navbar of auth change
     window.dispatchEvent(new Event('authChanged'));
-
-    // Redirect to home
-    navigate('/home');
+    navigate('/'); 
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center py-12 px-4">
+    <div className="w-full min-h-screen bg-[#FDFDFD] flex items-center justify-center py-20 px-6">
       <div className="max-w-md w-full">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-white"
-            >
-              <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
-              <line x1="6" x2="18" y1="17" y2="17"></line>
-            </svg>
-          </div>
-          <h1 className="text-4xl font-extrabold text-transparent bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text mb-2">
-            Create Account
+        
+        {/* --- Back Button --- */}
+        <button 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-[#2D4A22] font-black text-[10px] uppercase tracking-[0.3em] hover:text-[#F58220] transition-colors mb-10 group"
+        >
+          <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Home
+        </button>
+
+        {/* --- Header --- */}
+        <div className="mb-10">
+          <h1 className="text-5xl font-black text-[#2D4A22] uppercase tracking-tighter mb-4">
+            Join <span className="text-[#F58220]">Us</span>
           </h1>
-          <p className="text-gray-600">Join Delish-Kh today!</p>
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.3em]">
+            Create a premium account to start ordering
+          </p>
         </div>
 
-        {/* Register Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* --- Form --- */}
+        <div className="bg-white border border-gray-100 p-8 md:p-10 shadow-sm rounded-sm">
+          <form onSubmit={handleSubmit} className="space-y-7">
+            
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-50 p-4 border-l-4 border-red-500 text-red-700 text-[10px] font-black uppercase tracking-widest">
                 {error}
               </div>
             )}
 
-            {/* Name */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
-              <div className="relative">
-                <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Name Input */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Full Name</label>
+              <div className="relative group">
+                <FaUser className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#F58220] transition-colors" size={13} />
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                  placeholder="John Doe"
+                  className="w-full bg-transparent border-b-2 border-gray-100 py-2 pl-8 text-sm font-bold text-[#2D4A22] outline-none focus:border-[#2D4A22] transition-all"
+                  placeholder="EX. JOHN DOE"
                   required
                 />
               </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
-              <div className="relative">
-                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                  placeholder="your@email.com"
-                  required
-                />
+            {/* Email & Phone (Grid) */}
+            <div className="grid grid-cols-1 gap-7">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Email Address</label>
+                <div className="relative group">
+                  <FaEnvelope className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#F58220] transition-colors" size={13} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full bg-transparent border-b-2 border-gray-100 py-2 pl-8 text-sm font-bold text-[#2D4A22] outline-none focus:border-[#2D4A22] transition-all"
+                    placeholder="NAME@EMAIL.COM"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Phone Number</label>
+                <div className="relative group">
+                  <FaPhone className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#F58220] transition-colors" size={13} />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full bg-transparent border-b-2 border-gray-100 py-2 pl-8 text-sm font-bold text-[#2D4A22] outline-none focus:border-[#2D4A22] transition-all"
+                    placeholder="+855 00 000 000"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Phone Number</label>
-              <div className="relative">
-                <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                  placeholder="+855 12 345 678"
-                  required
-                />
+            {/* Passwords (Grid) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Password</label>
+                <div className="relative group">
+                  <FaLock className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#F58220] transition-colors" size={13} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full bg-transparent border-b-2 border-gray-100 py-2 pl-8 pr-8 text-sm font-bold text-[#2D4A22] outline-none focus:border-[#2D4A22] transition-all"
+                    placeholder="••••••"
+                    required
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-300">
+                    {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-[#2D4A22] uppercase tracking-[0.2em]">Confirm</label>
+                <div className="relative group">
+                  <FaLock className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#F58220] transition-colors" size={13} />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full bg-transparent border-b-2 border-gray-100 py-2 pl-8 pr-8 text-sm font-bold text-[#2D4A22] outline-none focus:border-[#2D4A22] transition-all"
+                    placeholder="••••••"
+                    required
+                  />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-300">
+                    {showConfirmPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Password</label>
-              <div className="relative">
-                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                  placeholder="Create password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Confirm Password</label>
-              <div className="relative">
-                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                  placeholder="Confirm password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-
-            {/* Terms & Conditions */}
-            <div>
-              <label className="flex items-start cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 mt-1 accent-orange-600 rounded" required />
-                <span className="ml-2 text-sm text-gray-600">
-                  I agree to the{' '}
-                  <a href="#" className="text-orange-600 hover:text-orange-700 font-semibold">
-                    Terms & Conditions
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="text-orange-600 hover:text-orange-700 font-semibold">
-                    Privacy Policy
-                  </a>
-                </span>
-              </label>
-            </div>
+            {/* Terms */}
+            <label className="flex items-center cursor-pointer group">
+              <input type="checkbox" className="w-4 h-4 accent-[#2D4A22] border-gray-200 rounded" required />
+              <span className="ml-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-[#2D4A22] transition-colors">
+                I accept terms & conditions
+              </span>
+            </label>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="w-full bg-[#2D4A22] text-white py-5 text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#1e3317] transition-all shadow-xl shadow-[#2D4A22]/10 active:scale-[0.98]"
             >
               Create Account
             </button>
           </form>
 
           {/* Login Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
+          <div className="mt-10 pt-8 border-t border-gray-50 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
               Already have an account?{' '}
-              <Link to="/login" className="text-orange-600 hover:text-orange-700 font-bold">
+              <Link to="/login" className="text-[#F58220] font-black ml-2 underline underline-offset-4 hover:text-[#2D4A22] transition-colors">
                 Sign In
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link to="/home" className="text-gray-600 hover:text-gray-900 font-semibold">
-            ← Back to Home
-          </Link>
         </div>
       </div>
     </div>

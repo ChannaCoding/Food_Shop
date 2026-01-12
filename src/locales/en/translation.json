@@ -259,10 +259,10 @@
     "reserveNow": "Reserve Now"
   },
   "about": {
-    "title": "About Delish-Kh",
+    "title": "About KHMER-FRESH",
     "subtitle": "Bringing authentic Khmer flavors to your table since 2020",
     "ourStory": "Our Story",
-    "storyPara1": "Delish-Kh was born from a passion for preserving and sharing the rich culinary heritage of Cambodia. Our journey began with a simple dream: to make authentic Khmer cuisine accessible to everyone, whether you're a local foodie or discovering these flavors for the first time.",
+    "storyPara1": "KHMER-FRESH was born from a passion for preserving and sharing the rich culinary heritage of Cambodia. Our journey began with a simple dream: to make authentic Khmer cuisine accessible to everyone, whether you're a local foodie or discovering these flavors for the first time.",
     "storyPara2": "Every dish we serve is crafted with traditional recipes passed down through generations, using the freshest local ingredients and time-honored cooking techniques. We believe that food is more than just sustenance – it's a celebration of culture, family, and community.",
     "authenticRecipes": "Authentic Recipes",
     "authenticRecipesDesc": "Traditional Khmer recipes prepared with love and respect for our culinary heritage",
@@ -279,7 +279,7 @@
     "menuItems": "Menu Items",
     "happyCustomers": "Happy Customers",
     "averageRating": "Average Rating",
-    "whyChooseUs": "Why Choose Delish-Kh?",
+    "whyChooseUs": "Why Choose KHMER-FRESH?",
     "awardWinning": "Award-Winning Cuisine",
     "awardWinningDesc": "Recognized for excellence in preserving and innovating traditional Khmer dishes.",
     "alwaysFresh": "Always Fresh",
@@ -291,5 +291,5 @@
     "ctaTitle": "Ready to Experience Authentic Khmer Cuisine?",
     "ctaSubtitle": "Explore our menu and taste the difference that passion and tradition make",
     "browseMenu": "Browse Our Menu"
-  }
+}
 }

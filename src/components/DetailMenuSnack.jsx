@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Toast from './Toast';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { khmerSnacks } from '../data';
-import { FaStar, FaShoppingCart, FaMinus, FaPlus, FaArrowLeft, FaHeart } from 'react-icons/fa';
-import { BiTime } from 'react-icons/bi';
-import { MdDeliveryDining } from 'react-icons/md';
+import { FaStar, FaShoppingCart, FaMinus, FaPlus, FaArrowLeft, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { BiTime, BiLeaf } from 'react-icons/bi';
+import { MdDeliveryDining, MdVerified } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 
 const DetailMenuSnack = () => {
   const { id } = useParams();
@@ -13,6 +14,7 @@ const DetailMenuSnack = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const { t } = useTranslation();
 
   const snack = khmerSnacks.find((item) => item.id === parseInt(id));
 
@@ -29,13 +31,11 @@ const DetailMenuSnack = () => {
   const handleFavoriteToggle = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     if (isFavorite) {
-      const updated = favorites.filter(
-        (item) => !(item.id === snack.id && item.type === 'snack')
-      );
+      const updated = favorites.filter((item) => !(item.id === snack.id && item.type === 'snack'));
       localStorage.setItem('favorites', JSON.stringify(updated));
       setIsFavorite(false);
     } else {
-      const favoriteItem = {
+      favorites.push({
         id: snack.id,
         name: snack.name,
         price: snack.price,
@@ -44,8 +44,7 @@ const DetailMenuSnack = () => {
         qty: snack.qty,
         type: 'snack',
         detailLink: `/MenuSnack/${snack.id}`,
-      };
-      favorites.push(favoriteItem);
+      });
       localStorage.setItem('favorites', JSON.stringify(favorites));
       setIsFavorite(true);
     }
@@ -54,14 +53,11 @@ const DetailMenuSnack = () => {
 
   if (!snack) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+      <div className="w-full min-h-screen flex items-center justify-center bg-[#FDFDFD]">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Snack Not Found</h2>
-          <Link
-            to="/MenuSnack"
-            className="text-orange-600 hover:text-orange-700 font-semibold"
-          >
-            ← Back to Snacks
+          <h2 className="text-2xl font-bold text-[#2D4A22] mb-4 uppercase tracking-widest">Snack Not Found</h2>
+          <Link to="/MenuSnack" className="text-[#F58220] font-black text-xs uppercase tracking-widest underline">
+            Back to Menu
           </Link>
         </div>
       </div>
@@ -78,19 +74,17 @@ const DetailMenuSnack = () => {
   const addToCart = () => {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      setToastMessage('Please login to add items to cart');
+      setToastMessage('Please login to continue');
       setShowToast(true);
       setTimeout(() => navigate('/login'), 1500);
       return;
     }
 
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItemIndex = cart.findIndex(
-      (item) => item.id === snack.id && item.type === 'snack'
-    );
+    const index = cart.findIndex((item) => item.id === snack.id && item.type === 'snack');
 
-    if (existingItemIndex >= 0) {
-      cart[existingItemIndex].quantity += quantity;
+    if (index >= 0) {
+      cart[index].quantity += quantity;
     } else {
       cart.push({
         id: snack.id,
@@ -107,10 +101,7 @@ const DetailMenuSnack = () => {
 
     localStorage.setItem('cart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartUpdated'));
-
-    setToastMessage(
-      `${quantity} ${snack.name}${quantity > 1 ? 's' : ''} added to cart!`
-    );
+    setToastMessage(`${snack.name} added to cart!`);
     setShowToast(true);
   };
 
@@ -118,149 +109,124 @@ const DetailMenuSnack = () => {
     <>
       {showToast && <Toast message={toastMessage} onClose={() => setShowToast(false)} />}
 
-      <div className="w-full min-h-screen bg-gradient-to-b from-orange-50 to-white py-10 px-4 sm:px-6 md:px-12 lg:px-20 overflow-x-hidden">
-        {/* Back link */}
-        <Link
-          to="/MenuSnack"
-          className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold mb-8 group"
-        >
-          <FaArrowLeft className="group-hover:-translate-x-1 transition-transform duration-300" />
-          Back to Snacks
-        </Link>
+      <div className="w-full min-h-screen bg-[#FDFDFD] pt-32 pb-20 px-6 md:px-14">
+        {/* --- Header Navigation --- */}
+        <div className="max-w-7xl mx-auto mb-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-[#2D4A22] font-black text-[10px] uppercase tracking-[0.3em] hover:text-[#F58220] transition-colors group"
+          >
+            <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+            {t('button.back') || 'Go Back'}
+          </button>
+        </div>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-start">
-          {/* 🥟 Image Section */}
-          <div className="relative w-full">
-            <div className="rounded-3xl overflow-hidden shadow-2xl">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+          
+          {/* --- Left Column: Image Section --- */}
+          <div className="relative group">
+            <div className="aspect-square rounded-sm overflow-hidden border border-gray-100 shadow-sm bg-white">
               <img
                 src={snack.image}
                 alt={snack.name}
-                className="w-full h-auto max-h-[450px] sm:max-h-[500px] object-cover rounded-3xl transition-transform duration-700 hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               />
             </div>
-
-            {/* Favorite + Category */}
+            {/* Floating Heart */}
             <button
               onClick={handleFavoriteToggle}
-              className="absolute top-4 right-4 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+              className="absolute top-6 right-6 w-12 h-12 bg-white flex items-center justify-center shadow-xl rounded-full hover:scale-110 transition-transform active:scale-95"
             >
-              <FaHeart
-                className={`text-lg ${isFavorite ? 'text-red-500' : 'text-gray-400'}`}
-              />
+              {isFavorite ? <FaHeart className="text-red-500" size={20} /> : <FaRegHeart className="text-gray-300" size={20} />}
             </button>
-
-            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
-              <span className="text-orange-600 font-bold text-sm">{snack.category}</span>
-            </div>
           </div>
 
-          {/* 🍘 Info Section */}
-          <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 md:p-10">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {snack.name}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-2 mb-6">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} className="text-yellow-400 text-lg" />
-                ))}
+          {/* --- Right Column: Info Section --- */}
+          <div className="flex flex-col">
+            {/* Product Header */}
+            <div className="border-b border-gray-100 pb-8 mb-8">
+              <div className="flex items-center gap-2 text-[#F58220] text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                <BiLeaf size={16} />
+                <span>Original {snack.category}</span>
               </div>
-              <span className="text-gray-600 text-sm sm:text-base font-medium">
-                (4.8) • 89 Reviews
-              </span>
+              <h1 className="text-4xl md:text-5xl font-bold text-[#2D4A22] uppercase tracking-tight mb-4">
+                {snack.name}
+              </h1>
+              <div className="flex items-center gap-4">
+                <div className="flex text-[#F58220]">
+                  {[...Array(5)].map((_, i) => <FaStar key={i} size={14} />)}
+                </div>
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                  (4.8 Rating / 89 Reviews)
+                </span>
+              </div>
             </div>
 
-            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8">
-              {snack.description}
+            {/* Description Area */}
+            <p className="text-gray-500 text-sm leading-relaxed mb-10 max-w-xl italic">
+              "{snack.description}"
             </p>
 
-            {/* 💰 Price */}
-            <div className="mb-8">
-              <div className="flex flex-wrap items-baseline gap-3">
-                <span className="text-4xl sm:text-5xl font-bold text-transparent bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text">
-                  ${totalPrice}
-                </span>
-                <span className="text-gray-500 text-lg line-through">
-                  ${(snack.price * 1.5 * quantity).toFixed(2)}
-                </span>
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
-                  33% OFF
+            {/* Price & Stock Display */}
+            <div className="flex items-end gap-4 mb-10">
+              <span className="text-4xl font-black text-[#2D4A22]">${totalPrice}</span>
+              <span className="text-lg text-gray-300 line-through font-medium mb-1">${(snack.price * 1.5).toFixed(2)}</span>
+              <div className="bg-[#2D4A22] text-white text-[9px] font-black px-2 py-1 rounded-sm mb-2 uppercase tracking-tighter">
+                Quick Deal
+              </div>
+            </div>
+
+            {/* Quantity Control */}
+            <div className="mb-10">
+              <p className="text-[11px] font-black text-[#2D4A22] uppercase tracking-widest mb-4">Adjust Quantity</p>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center border border-gray-200 rounded-sm">
+                  <button onClick={() => handleQuantityChange('decrease')} className="px-4 py-3 hover:bg-gray-50 transition-colors border-r border-gray-200">
+                    <FaMinus size={10} />
+                  </button>
+                  <span className="px-8 font-bold text-[#2D4A22]">{quantity}</span>
+                  <button onClick={() => handleQuantityChange('increase')} className="px-4 py-3 hover:bg-gray-50 transition-colors border-l border-gray-200">
+                    <FaPlus size={10} />
+                  </button>
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                   {snack.qty} Packs Available
                 </span>
               </div>
             </div>
 
-            {/* Quantity */}
-            <div className="mb-8">
-              <label className="block text-gray-700 font-semibold mb-3 text-lg">
-                Quantity
-              </label>
-              <div className="flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => handleQuantityChange('decrease')}
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition"
-                >
-                  <FaMinus className="text-orange-600" />
-                </button>
-                <span className="text-2xl font-bold text-gray-900 w-14 text-center">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => handleQuantityChange('increase')}
-                  className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition"
-                >
-                  <FaPlus className="text-orange-600" />
-                </button>
-                <span className="text-gray-500 text-sm sm:text-base">
-                  Available:{' '}
-                  <span className="font-semibold text-green-600">
-                    {snack.qty} items
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            {/* Primary Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <button
                 onClick={addToCart}
-                className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:scale-105 transition flex items-center justify-center gap-2"
+                className="flex-[2] bg-[#2D4A22] text-white py-5 px-8 font-black text-xs uppercase tracking-[0.2em] hover:bg-[#1e3317] transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#2D4A22]/20"
               >
-                <FaShoppingCart /> Add to Cart
+                <FaShoppingCart /> Add To Cart
               </button>
-              <Link
-                to="/cart"
-                className="flex-1 sm:flex-none px-6 bg-orange-100 hover:bg-orange-200 text-orange-600 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition text-center"
+              <button
+                onClick={() => navigate('/cart')}
+                className="flex-1 border-2 border-[#2D4A22] text-[#2D4A22] py-5 px-8 font-black text-xs uppercase tracking-[0.2em] hover:bg-[#2D4A22] hover:text-white transition-all text-center"
               >
                 Buy Now
-              </Link>
+              </button>
             </div>
 
-            {/* Features */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-orange-50 p-4 rounded-xl text-center">
-                <MdDeliveryDining className="text-3xl text-orange-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-gray-700">Free Delivery</p>
+            {/* Secondary Info Grid */}
+            <div className="grid grid-cols-3 gap-1 pt-8 border-t border-gray-100">
+              <div className="flex flex-col items-center p-4 border-r border-gray-100">
+                <MdDeliveryDining className="text-[#F58220] mb-2" size={24} />
+                <span className="text-[9px] font-black text-[#2D4A22] uppercase tracking-tighter text-center">Free Delivery</span>
               </div>
-              <div className="bg-orange-50 p-4 rounded-xl text-center">
-                <BiTime className="text-3xl text-orange-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-gray-700">30 Min</p>
+              <div className="flex flex-col items-center p-4 border-r border-gray-100">
+                <BiTime className="text-[#F58220] mb-2" size={24} />
+                <span className="text-[9px] font-black text-[#2D4A22] uppercase tracking-tighter text-center">15-30 Mins</span>
               </div>
-              <div className="bg-orange-50 p-4 rounded-xl text-center">
-                <FaStar className="text-3xl text-orange-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-gray-700">Top Rated</p>
+              <div className="flex flex-col items-center p-4">
+                <MdVerified className="text-[#F58220] mb-2" size={24} />
+                <span className="text-[9px] font-black text-[#2D4A22] uppercase tracking-tighter text-center">Quality Check</span>
               </div>
             </div>
 
-            {/* Promo */}
-            <div className="bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl p-6">
-              <h3 className="font-bold text-lg text-gray-900 mb-2">
-                🥟 Perfect Snack Time!
-              </h3>
-              <p className="text-gray-700 text-sm sm:text-base">
-                Enjoy our authentic Khmer snacks — perfect for any time of the day!
-              </p>
-            </div>
           </div>
         </div>
       </div>
