@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import Amok from '../assets/image/benner.png'
+import Amok from '../assets/image/benner2.png'
 import 'animate.css';
 
 const Benner = () => {
