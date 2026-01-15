@@ -36,41 +36,41 @@ const Category = () => {
                             data-aos-delay={index * 100}
                             className='group relative w-full h-[450px] bg-gray-900 overflow-hidden cursor-pointer shadow-xl'
                         >
-                            {/* 1. រូបភាព Background - រាងជ្រុងដាច់ */}
+                            {/* រូបភាព Background */}
                             <img 
                                 src={s.imageUrl} 
-                                className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:opacity-40' 
+                                className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-60 md:opacity-100 md:group-hover:opacity-40' 
                                 alt={s.name} 
                             />
 
-                            {/* 2. ខ្លឹមសារដែលនឹងអណ្តែតចេញពីក្រោមឡើងលើ */}
-                            <div className='absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-all duration-500'>
+                            {/* ខ្លឹមសារ */}
+                            <div className='absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-all duration-500'>
                                 
-                                {/* ចំណងជើង - បង្ហាញជានិច្ច */}
-                                <h3 className='text-2xl font-black text-white uppercase tracking-tighter mb-2 transform group-hover:-translate-y-2 transition-transform duration-500'>
+                                <h3 className='text-2xl font-black text-white uppercase tracking-tighter mb-2 transform md:group-hover:-translate-y-2 transition-transform duration-500'>
                                     {s.name}
                                 </h3>
 
-                                {/* បន្ទាត់លម្អ */}
-                                <div className='w-10 h-1 bg-orange-500 mb-4 transition-all duration-500 group-hover:w-full'></div>
+                                {/* បន្ទាត់លម្អ - ឱ្យវារត់ពេញតែម្តងលើ Mobile */}
+                                <div className='h-1 bg-orange-500 mb-4 transition-all duration-500 w-full md:w-10 md:group-hover:w-full'></div>
 
-                                {/* ផ្នែកដែលលាក់ រួចអណ្តែតឡើងលើពេល Hover */}
-                                <div className='max-h-0 opacity-0 group-hover:max-h-[200px] group-hover:opacity-100 transition-all duration-700 ease-in-out overflow-hidden'>
+                                {/* ផ្នែកព័ត៌មាន និងប៊ូតុង */}
+                                {/* ចំណុចកែប្រែ៖ ប្រើ opacity-100 លើ mobile និង md:opacity-0 លើ desktop */}
+                                <div className='opacity-100 max-h-[200px] md:opacity-0 md:max-h-0 md:group-hover:opacity-100 md:group-hover:max-h-[200px] transition-all duration-700 ease-in-out overflow-hidden'>
                                     <p className='text-gray-300 text-sm leading-relaxed mb-6 font-medium'>
                                         {s.description}
                                     </p>
                                     
                                     <Link
                                         to={s.linkUrl}
-                                        className='inline-flex items-center gap-2 text-white font-black text-xs uppercase tracking-[0.2em] bg-orange-600 hover:bg-orange-700 px-6 py-3 transition-colors'
+                                        className='inline-flex items-center gap-2 text-white font-black text-xs uppercase tracking-[0.2em] bg-orange-600 hover:bg-orange-700 px-6 py-3 transition-colors shadow-lg'
                                     >
                                         Explore Menu <IoArrowForward size={16} />
                                     </Link>
                                 </div>
                             </div>
 
-                            {/* លម្អជ្រុង Card ពេល Hover (Optional: បន្ថែម Border ជ្រុងពណ៌ទឹកក្រូច) */}
-                            <div className='absolute inset-0 border-0 group-hover:border-[10px] border-white/10 transition-all duration-500 pointer-events-none'></div>
+                            {/* Border លម្អ - បង្ហាញតែលើ Desktop */}
+                            <div className='hidden md:block absolute inset-0 border-0 group-hover:border-[10px] border-white/10 transition-all duration-500 pointer-events-none'></div>
                         </div>
                     ))}
                 </div>
