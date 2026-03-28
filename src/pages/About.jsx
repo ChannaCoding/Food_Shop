@@ -52,7 +52,7 @@ const About = () => {
           <div className="grid lg:grid-cols-12 gap-12 items-center relative z-10">
             {/* Left Side: Bold Text Heading */}
             <div className="lg:col-span-5" data-aos="fade-right">
-              <span className="text-[#F58220] font-black text-sm uppercase tracking-[0.4em] mb-4 block">Since 2018</span>
+              <span className="text-[#F58220] font-black text-sm uppercase tracking-[0.4em] mb-4 block">Since 2025</span>
               <h2 className="text-6xl md:text-7xl font-black text-[#2D4A22] uppercase leading-[0.9] tracking-tighter">
                 {t('about.ourStory').split(' ')[0]} <br />
                 <span className="text-gray-200 outline-text italic">Journey</span> <br />

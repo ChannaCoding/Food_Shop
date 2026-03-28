@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Amok from '../assets/image/benner2.png'
 import 'animate.css';
-
+import { Link } from "react-router-dom";
 const Benner = () => {
   const { t } = useTranslation();
   
@@ -40,11 +40,12 @@ const Benner = () => {
           </p>
 
           <div className="pt-4">
-            <button className="px-10 py-3.5 bg-[#2d5a27] text-white rounded-md font-bold text-xl hover:bg-[#1a2e35] transition-all duration-300 shadow-lg active:scale-95">
-              Get Started
-            </button>
+            <Link to="/menu">
+              <button className="px-10 py-3.5 bg-[#2d5a27] text-white rounded-md font-bold text-xl hover:bg-[#1a2e35] transition-all duration-300 shadow-lg active:scale-95">
+                Get Started
+              </button>
+            </Link>
           </div>
-          
         </div>
 
       </div>

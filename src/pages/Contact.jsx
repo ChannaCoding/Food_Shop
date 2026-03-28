@@ -40,7 +40,7 @@ const Contact = () => {
               <p className="text-[#F58220] font-bold text-[10px] uppercase tracking-widest">{t('contact.phone')}</p>
               <div className="flex items-center gap-3">
                 <FaPhoneAlt className="text-[#2D4A22] text-sm" />
-                <p className="text-[#2D4A22] font-semibold text-lg italic">012 345 678 / 098 765 432</p>
+                <p className="text-[#2D4A22] font-semibold text-lg italic">0972325094 / 0973157848</p>
               </div>
             </div>
 
