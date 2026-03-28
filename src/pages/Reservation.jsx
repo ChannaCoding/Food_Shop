@@ -131,7 +131,7 @@ const Reservation = () => {
         <div className="mt-16 grid md:grid-cols-3 gap-8 border-t border-gray-100 pt-10">
           <div className="text-center md:text-left">
             <p className="text-[#2D4A22] font-black text-[10px] uppercase tracking-widest mb-1">Direct Line</p>
-            <p className="text-gray-500 font-bold">+855 23 945 878</p>
+            <p className="text-gray-500 font-bold">+855 972325094</p>
           </div>
           <div className="text-center md:text-left">
             <p className="text-[#2D4A22] font-black text-[10px] uppercase tracking-widest mb-1">Location</p>
